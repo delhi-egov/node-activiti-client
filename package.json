@@ -1,0 +1,14 @@
+{
+  "name": "node-activiti-client",
+  "version": "1.0.0",
+  "description": "Node client to access Activiti Engine through REST api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vaibhav Sinha",
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.72.0"
+  }
+}
