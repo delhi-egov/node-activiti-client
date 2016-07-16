@@ -12,9 +12,9 @@ module.exports = class ActivitiClient {
         this.auth = auth;
     }
 
-    static getProcessInstances(processDefinitionKey, start, size, callback) {
+    getProcessInstancesByDefinitionKey(processDefinitionKey, start, size, callback) {
         Request({
-            url: this.baseUrl + "/runtime/process-instances?processDefinitionKey=" + processDefinitionKey + "&size=" + size + "&start=" + start,
+            url: this.baseUrl + "/runtime/process-instances?processDefinitionKey=" + processDefinitionKey + "&size=" + size + "&start=" + start + "&excludeSubprocesses=true",
             method: "GET",
             auth: this.auth
         }, function(err, httpResponse, body) {
@@ -30,7 +30,25 @@ module.exports = class ActivitiClient {
         });
     }
 
-    static getProcessStatus(processInstanceId, callback) {
+    getProcessInstancesByBusinessKey(businessKey, start, size, callback) {
+        Request({
+            url: this.baseUrl + "/runtime/process-instances?businessKey=" + businessKey + "&size=" + size + "&start=" + start + "&excludeSubprocesses=true",
+            method: "GET",
+            auth: this.auth
+        }, function(err, httpResponse, body) {
+            if(err) {
+                return callback(err, null);
+            }
+            if (httpResponse.statusCode == 200) {
+                return callback(null, body);
+            }
+            else {
+                return callback(body, null);
+            }
+        });
+    }
+
+    getProcessStatus(processInstanceId, callback) {
         Request({
             url: this.baseUrl + "/runtime/executions/" + processInstanceId + "/activities",
             method: "GET",
@@ -49,9 +67,10 @@ module.exports = class ActivitiClient {
     }
 
     //Here variables is a list of objects with properties name, value, type of which type is optional
-    static startProcessInstance(processDefinitionKey, variables, callback) {
+    startProcessInstance(processDefinitionKey, businessKey, variables, callback) {
         var params = {
             processDefinitionKey: processDefinitionKey,
+            businessKey: businessKey,
             variables: variables
         };
 
@@ -73,4 +92,48 @@ module.exports = class ActivitiClient {
             }
         });
     }
-}
+
+    getProcessTasks(businessKey, callback) {
+        Request({
+            url: this.baseUrl + "/runtime/tasks?assignee=" + this.auth.user + "&processInstanceBusinessKey=" + businessKey,
+            method: "GET",
+            auth: this.auth
+        }, function(err, httpResponse, body) {
+            if(err) {
+                return callback(err, null);
+            }
+            if (httpResponse.statusCode == 200) {
+                return callback(null, body);
+            }
+            else {
+                return callback(body, null);
+            }
+        });
+    }
+
+    //Here variables is a list of objects with properties name, value, type of which type is optional
+    completeProcessTask(taskId, variables, callback) {
+        var params = {
+            action: "complete",
+            variables: variables
+        };
+
+        Request({
+            url: this.baseUrl + "/runtime/tasks/" + taskId,
+            method: "POST",
+            body: params,
+            json: true,
+            auth: this.auth
+        }, function(err, httpResponse, body) {
+            if(err) {
+                return callback(err, null);
+            }
+            if (httpResponse.statusCode == 200) {
+                return callback(null, body);
+            }
+            else {
+                return callback(body, null);
+            }
+        });
+    }
+};
