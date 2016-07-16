@@ -66,7 +66,18 @@ module.exports = class ActivitiClient {
         });
     }
 
-    //Here variables is a list of objects with properties name, value, type of which type is optional
+    getProcessStatusByBusinessKey(businessKey, callback) {
+        var that = this;
+
+        this.getProcessInstancesByBusinessKey(businessKey, 0, 1, function(err, response) {
+            if(err) {
+                return callback(err);
+            }
+            that.getProcessStatus(response.data[0], callback);
+        });
+    }
+
+    //Here variables is a list of objects with properties name, value and type, of which type is optional
     startProcessInstance(processDefinitionKey, businessKey, variables, callback) {
         var params = {
             processDefinitionKey: processDefinitionKey,
@@ -111,8 +122,26 @@ module.exports = class ActivitiClient {
         });
     }
 
+    getTaskVariables(taskId, callback) {
+        Request({
+            url: this.baseUrl + "/runtime/tasks/" + taskId + "/variables",
+            method: "GET",
+            auth: this.auth
+        }, function(err, httpResponse, body) {
+            if(err) {
+                return callback(err, null);
+            }
+            if (httpResponse.statusCode == 200) {
+                return callback(null, body);
+            }
+            else {
+                return callback(body, null);
+            }
+        });
+    }
+
     //Here variables is a list of objects with properties name, value, type of which type is optional
-    completeProcessTask(taskId, variables, callback) {
+    completeTask(taskId, variables, callback) {
         var params = {
             action: "complete",
             variables: variables
