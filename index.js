@@ -16,6 +16,7 @@ module.exports = class ActivitiClient {
         Request({
             url: this.baseUrl + "/runtime/process-instances?processDefinitionKey=" + processDefinitionKey + "&size=" + size + "&start=" + start + "&excludeSubprocesses=true",
             method: "GET",
+            json: true,
             auth: this.auth
         }, function(err, httpResponse, body) {
             if(err) {
@@ -34,6 +35,7 @@ module.exports = class ActivitiClient {
         Request({
             url: this.baseUrl + "/runtime/process-instances?businessKey=" + businessKey + "&size=" + size + "&start=" + start + "&excludeSubprocesses=true",
             method: "GET",
+            json: true,
             auth: this.auth
         }, function(err, httpResponse, body) {
             if(err) {
@@ -52,6 +54,7 @@ module.exports = class ActivitiClient {
         Request({
             url: this.baseUrl + "/runtime/executions/" + processInstanceId + "/activities",
             method: "GET",
+            json: true,
             auth: this.auth
         }, function(err, httpResponse, body) {
             if(err) {
@@ -73,7 +76,7 @@ module.exports = class ActivitiClient {
             if(err) {
                 return callback(err);
             }
-            that.getProcessStatus(response.data[0], callback);
+            that.getProcessStatus(response.data[0].id, callback);
         });
     }
 
@@ -108,6 +111,7 @@ module.exports = class ActivitiClient {
         Request({
             url: this.baseUrl + "/runtime/tasks?assignee=" + this.auth.user + "&processInstanceBusinessKey=" + businessKey,
             method: "GET",
+            json: true,
             auth: this.auth
         }, function(err, httpResponse, body) {
             if(err) {
@@ -126,6 +130,7 @@ module.exports = class ActivitiClient {
         Request({
             url: this.baseUrl + "/runtime/tasks/" + taskId + "/variables",
             method: "GET",
+            json: true,
             auth: this.auth
         }, function(err, httpResponse, body) {
             if(err) {
